@@ -2,13 +2,6 @@ data "aws_ecs_cluster" "ecs_cluster" {
   cluster_name = "fase4-infra-microservices-ecs-cluster"
 }
 
-data "aws_security_group" "ecs_sg" {
-  filter {
-    name   = "group-name"
-    values = ["fase4-infra-microservices-ecs-sg"]
-  }
-}
-
 data "aws_security_group" "alb_sg" {
   filter {
     name   = "group-name"
