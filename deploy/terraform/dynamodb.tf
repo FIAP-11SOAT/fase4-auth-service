@@ -21,7 +21,8 @@ resource "aws_dynamodb_table" "users" {
   }
 
   tags = {
-    Name = "Tabela de Usuários"
+    Name = "${local.project_name}-users"
+    Description = "DynamoDB table to store user information"
   }
 }
 
