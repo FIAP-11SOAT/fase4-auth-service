@@ -1,27 +1,24 @@
-import boto3
-from fastapi import APIRouter, Depends
-from fastapi.responses import ORJSONResponse
-from starlette import status
+from fastapi import APIRouter
 
-from source.depends.jwt_provider import DependsJwtSignatureProvider
-from source.dtos.auth import AuthQuery
-from source.helpers.repository import DatabaseRepository
+from source.depends.jwt_signer import DependsJwtSigner
+from source.depends.repository import DependsRepository
+from source.schemas.request.auth import AuthRequestQuery, AuthCreateRequestBody
+from source.schemas.response.auth import AuthResponse, RegisterResponse
+from source.usecase.auth import AuthUseCase, RegisterUseCase
 
-router = APIRouter()
-
-@router.get("/auth")
-def login(jwt_provider: DependsJwtSignatureProvider, query: AuthQuery):
-    repository = DatabaseRepository(
-        resource=boto3.resource("dynamodb"),
-        table_name="fase4-auth-service-users",
-    )
-    result = repository.find_user_by_tax_id(tax_id=query.tax_id)
-    return ORJSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"query": query.model_dump(), "user": result},
-    )
+router = APIRouter(
+    prefix="/v1",
+    tags=["auth"]
+)
 
 
-@router.post("/auth")
-def register():
-    pass
+@router.get("/auth", response_model=AuthResponse)
+async def auth(q: AuthRequestQuery, repo: DependsRepository, jwt_signer: DependsJwtSigner):
+    use_case = AuthUseCase(repository=repo, jwt_signer=jwt_signer)
+    return await use_case.execute(tax_id=q.tax_id)
+
+
+@router.post("/auth", response_model=RegisterResponse, status_code=201)
+async def register(body: AuthCreateRequestBody, repo: DependsRepository):
+    use_case = RegisterUseCase(repository=repo)
+    return await use_case.execute(tax_id=body.tax_id, email=body.email, name=body.name)

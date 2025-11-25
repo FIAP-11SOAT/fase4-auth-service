@@ -21,7 +21,7 @@ resource "aws_dynamodb_table" "users" {
   }
 
   tags = {
-    Name = "${local.project_name}-users"
+    Name        = "${local.project_name}-users"
     Description = "DynamoDB table to store user information"
   }
 }
@@ -39,6 +39,8 @@ resource "aws_dynamodb_table_item" "create_anonymous_user" {
       "user_type": {"S": "customers"}
     }
   ITEM
+
+  depends_on = [aws_dynamodb_table.users]
 }
 
 resource "aws_dynamodb_table_item" "create_employee_user" {
@@ -54,4 +56,6 @@ resource "aws_dynamodb_table_item" "create_employee_user" {
       "user_type": {"S": "employees"}
     }
   ITEM
+
+  depends_on = [aws_dynamodb_table.users]
 }

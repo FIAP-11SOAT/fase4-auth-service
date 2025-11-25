@@ -1,11 +1,14 @@
 from fastapi import APIRouter
 
+router = APIRouter(
+    include_in_schema=False,
+)
 
-router = APIRouter()
 
 @router.get("/")
 def root():
     return {"message": "Auth Service is running"}
+
 
 @router.get("/health")
 def health():
