@@ -1,9 +1,9 @@
+import typing
+
 from source.configs.secrets import Secrets
 from source.configs.settings import Settings
 from source.helpers.jwt import JwtSignatureProvider
 from source.helpers.repository import AsyncDatabaseRepository
-
-import typing
 
 
 class Services:

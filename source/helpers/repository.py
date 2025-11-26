@@ -19,7 +19,7 @@ class AsyncDatabaseRepository:
             if self.table_name in existing_tables:
                 return False
 
-            table = await dynamodb.create_table(
+            await dynamodb.create_table(
                 TableName=self.table_name,
                 BillingMode='PAY_PER_REQUEST',
                 KeySchema=[
@@ -29,18 +29,10 @@ class AsyncDatabaseRepository:
                     {'AttributeName': 'id', 'AttributeType': 'S'},
                     {'AttributeName': 'tax_id', 'AttributeType': 'S'}
                 ],
-                GlobalSecondaryIndexes=[
-                    {
-                        'IndexName': 'TaxIDIndex',
-                        'KeySchema': [
-                            {'AttributeName': 'tax_id', 'KeyType': 'HASH'}
-                        ],
-                        'Projection': {
-                            'ProjectionType': 'ALL'
-                        }
-                    }
-                ],
-            )
+                GlobalSecondaryIndexes=[{
+                    'IndexName': 'TaxIDIndex',
+                    'KeySchema': [{'AttributeName': 'tax_id', 'KeyType': 'HASH'}],
+                    'Projection': {'ProjectionType': 'ALL'}}])
             return True
 
     @asynccontextmanager
