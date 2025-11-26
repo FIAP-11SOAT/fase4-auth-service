@@ -104,7 +104,7 @@ jobs:
     needs: test
     steps:
       - name: Download test reports
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v5
         with:
           name: testreports
 
