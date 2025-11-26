@@ -22,9 +22,7 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     find /usr/local -name '*.pyc' -delete && \
-    find /usr/local -name '__pycache__' -delete && \
-    find /home/app -name '*.pyc' -delete && \
-    find /home/app -name '__pycache__' -delete
+    find /usr/local -name '__pycache__' -delete
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY ./pyproject.toml ${APP_BASE_DIR}/pyproject.toml
