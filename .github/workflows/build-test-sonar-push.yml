@@ -65,10 +65,16 @@ jobs:
       - name: Load test image
         run: docker load -i $REPOSITORY_NAME-tests.tar
 
+      - name: Get Docker Network IP
+        id: docker-network
+        run: |
+          echo "DOCKER_NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep github_network_)" >> $GITHUB_ENV
+
       - name: Run tests in Docker container
         run: |
           mkdir -p reports
           docker run --rm \
+            --network ${{ env.DOCKER_NETWORK_NAME }} \
             -v ${{ github.workspace }}/reports:/app/reports \
             $REPOSITORY_NAME-tests:latest
 
