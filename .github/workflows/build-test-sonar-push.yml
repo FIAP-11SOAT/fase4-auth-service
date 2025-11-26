@@ -1,0 +1,136 @@
+name: Build/Test/Sonar/Push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  REPOSITORY_NAME: ${{ github.event.repository.name }}
+  REPORTS_PATH: reports
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Build imagem de teste
+      - name: Build Docker test image
+        run: docker build --no-cache -t $REPOSITORY_NAME-tests:latest --target tests  .
+
+      - name: Save test image as tar
+        run: docker save $REPOSITORY_NAME-tests:latest -o $REPOSITORY_NAME-tests.tar
+
+      - name: Upload test image tar
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-test-image
+          path: $REPOSITORY_NAME-tests.tar
+
+      # Build imagem de produção
+      - name: Build Docker production image
+        run: docker build --no-cache -t $REPOSITORY_NAME-app:latest --target production .
+
+      - name: Save production image as tar
+        run: docker save $REPOSITORY_NAME-app:latest -o $REPOSITORY_NAME-prod.tar
+
+      - name: Upload production image tar
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-prod-image
+          path: $REPOSITORY_NAME-prod.tar
+
+      - name: List Docker images
+        run: docker images
+
+
+#  test:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    services:
+#      dynamodb-local:
+#        image: amazon/dynamodb-local
+#        ports:
+#          - 8000:8000
+#    steps:
+#      - name: Download test image tar
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: docker-test-image
+#
+#      - name: Load test image
+#        run: docker load -i meuapp-tests.tar
+#
+#      - name: Run tests in Docker container
+#        run: |
+#          mkdir -p reports
+#          docker run --rm \
+#            --network host \
+#            -v ${{ github.workspace }}/reports:/app/reports \
+#            meuapp-tests:latest
+#
+#      - name: Upload test reports for Sonar
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: testreports
+#          path: |
+#            reports/report.xml
+#            reports/coverage.xml
+#
+#  sonar:
+#    runs-on: ubuntu-latest
+#    needs: test
+#    steps:
+#      - name: Download test reports
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: testreports
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+#      - name: SonarQube Scan
+#        uses: SonarSource/sonarqube-scan-action@v6
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#
+#  push:
+#    runs-on: ubuntu-latest
+#    needs: sonar
+#    steps:
+#      - name: Download production image tar
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: docker-prod-image
+#
+#      - name: Load production image
+#        run: docker load -i meuapp-prod.tar
+#
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v3
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-east-1   # ajuste conforme sua região
+#
+#      - name: Login to Amazon ECR
+#        uses: aws-actions/amazon-ecr-login@v2
+#
+#      - name: Tag image for ECR
+#        run: |
+#          ECR_REGISTRY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com"
+#          ECR_REPOSITORY="meuapp"
+#          docker tag meuapp-prod:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+#
+#      - name: Push image to ECR
+#        run: |
+#          ECR_REGISTRY="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com"
+#          ECR_REPOSITORY="meuapp"
+#          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+

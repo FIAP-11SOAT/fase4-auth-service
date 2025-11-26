@@ -34,6 +34,8 @@ def generate_test_rsa_key_pair():
 @pytest.fixture(scope="session")
 def localstack_container():
     """Start LocalStack container with DynamoDB"""
+    if os.getenv("CI"):
+        pytest.skip("Skipping LocalStack in CI")
     with LocalStackContainer(image="localstack/localstack:latest") as localstack:
         localstack.with_services("dynamodb")
         yield localstack
@@ -45,10 +47,13 @@ def aws_credentials(localstack_container):
     os.environ["AWS_ACCESS_KEY_ID"] = "test"
     os.environ["AWS_SECRET_ACCESS_KEY"] = "test"
     os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
-    os.environ["AWS_ENDPOINT_URL"] = localstack_container.get_url()
+    if os.getenv("CI"):
+        os.environ["AWS_ENDPOINT_URL"] = "http://localhost:8000"
+    else:
+        os.environ["AWS_ENDPOINT_URL"] = localstack_container.get_url()
 
     return {
-        "endpoint_url": localstack_container.get_url(),
+        "endpoint_url": os.environ["AWS_ENDPOINT_URL"],
         "region_name": "us-east-1"
     }
 
@@ -153,10 +158,9 @@ def jwt_signer(test_private_key):
 @pytest_asyncio.fixture(scope="function")
 async def test_services(repository, jwt_signer):
     """Create Services instance for testing"""
-    services = Services(
-        jwt_signer=jwt_signer,
-        repository=repository
-    )
+    services = Services()
+    services.jwt_signer = jwt_signer
+    services.repository = repository
     return services
 
 
@@ -191,7 +195,7 @@ async def test_app(test_services):
 async def client(test_app):
     """Create HTTP client for testing"""
     transport = ASGITransport(app=test_app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    async with AsyncClient(transport=transport, base_url="https://test") as ac:
         yield ac
 
 
@@ -203,4 +207,3 @@ def sample_user_data():
         "email": "test@example.com",
         "name": "Test User"
     }
-

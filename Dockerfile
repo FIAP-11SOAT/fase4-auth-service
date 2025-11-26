@@ -1,5 +1,6 @@
 FROM python:3.13-slim AS base_env
 
+ENV USER=app
 ENV LOCALE=en_US
 ENV LANG_ENV=en_US
 ENV SYSTEM_TIMEZONE=UTC
@@ -28,6 +29,10 @@ RUN apt-get update && \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY ./pyproject.toml ${APP_BASE_DIR}/pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --no-dev --directory ${APP_BASE_DIR}
+
+RUN chown -R "$USER":"$USER" $APP_BASE_DIR
+USER $USER
+
 
 # Production stage
 FROM builder AS production
