@@ -1,6 +1,5 @@
 FROM python:3.13-slim AS base_env
 
-ENV USER=app
 ENV LOCALE=en_US
 ENV LANG_ENV=en_US
 ENV SYSTEM_TIMEZONE=UTC
@@ -13,9 +12,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 ENV PYTHONPATH=$APP_BASE_DIR
-
-# 👉 Adicionado: criar usuário e diretório com permissões
-RUN groupadd -r $USER && useradd -r -m -d $APP_BASE_DIR -g $USER $USER
 
 
 FROM base_env AS builder
@@ -31,10 +27,6 @@ RUN apt-get update && \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY ./pyproject.toml ${APP_BASE_DIR}/pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --no-dev --directory ${APP_BASE_DIR}
-
-# 👉 Adicionado: ajustar permissões e trocar usuário
-RUN chown -R $USER:$USER $APP_BASE_DIR
-USER $USER
 
 
 # Production stage
@@ -53,8 +45,6 @@ FROM production AS tests
 
 ENV CI="1"
 ENV TESTS_ROOT=${APP_BASE_DIR}/tests
-
-USER root
 
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --directory ${APP_BASE_DIR}
 
