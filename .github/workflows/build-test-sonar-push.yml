@@ -97,22 +97,27 @@ jobs:
 
       - name: List reports directory
         run: ls -la reports
-#
-#  sonar:
-#    runs-on: ubuntu-latest
-#    needs: test
-#    steps:
-#      - name: Download test reports
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: testreports
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-#      - name: SonarQube Scan
-#        uses: SonarSource/sonarqube-scan-action@v6
-#        env:
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  sonar:
+    name: SonarQube Analysis
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Download test reports
+        uses: actions/download-artifact@v3
+        with:
+          name: testreports
+
+      - name: List reports directory
+        run: ls -la reports
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #
 #  push:
 #    runs-on: ubuntu-latest
