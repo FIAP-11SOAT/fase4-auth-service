@@ -69,7 +69,6 @@ jobs:
         run: |
           mkdir -p reports
           docker run --rm \
-            --network host \
             -v ${{ github.workspace }}/reports:/app/reports \
             $REPOSITORY_NAME-tests:latest
 
