@@ -28,14 +28,11 @@ jobs:
       - name: Save test image as tar
         run: docker save $REPOSITORY_NAME-tests:latest -o $REPOSITORY_NAME-tests.tar
 
-      - name: List saved tar files
-        run: ls -la
-
       - name: Upload test image tar
         uses: actions/upload-artifact@v4
         with:
           name: docker-test-image
-          path: ${REPOSITORY_NAME}-tests.tar
+          path: ${{ env.REPOSITORY_NAME }}-tests.tar
 
       # Build imagem de produção
       - name: Build Docker production image
@@ -44,17 +41,11 @@ jobs:
       - name: Save production image as tar
         run: docker save $REPOSITORY_NAME-app:latest -o $REPOSITORY_NAME-prod.tar
 
-      - name: List saved tar files
-        run: ls -la
-
       - name: Upload production image tar
         uses: actions/upload-artifact@v4
         with:
           name: docker-prod-image
-          path: ${REPOSITORY_NAME}-prod.tar
-
-      - name: List Docker images
-        run: docker images
+          path: ${{ env.REPOSITORY_NAME }}-prod.tar
 
   test:
     name: Run Tests
