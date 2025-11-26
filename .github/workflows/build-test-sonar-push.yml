@@ -77,6 +77,7 @@ jobs:
           
           # Roda o container montando a pasta inteira (ou só o que precisar)
           docker run --rm \
+            --user "$(id -u):$(id -g)" \
             --network ${{ env.DOCKER_NETWORK_NAME }} \
             -v ${{ github.workspace }}/reports:/home/app/reports \
             $REPOSITORY_NAME-tests:latest
