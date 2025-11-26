@@ -28,7 +28,7 @@ jobs:
         run: docker save $REPOSITORY_NAME-tests:latest -o $REPOSITORY_NAME-tests.tar
 
       - name: Upload test image tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-test-image
           path: $REPOSITORY_NAME-tests.tar
@@ -41,7 +41,7 @@ jobs:
         run: docker save $REPOSITORY_NAME-app:latest -o $REPOSITORY_NAME-prod.tar
 
       - name: Upload production image tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-prod-image
           path: $REPOSITORY_NAME-prod.tar
