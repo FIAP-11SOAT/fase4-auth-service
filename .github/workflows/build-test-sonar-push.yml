@@ -103,6 +103,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Download test reports
         uses: actions/download-artifact@v5
         with:
@@ -111,9 +115,6 @@ jobs:
       - name: List downloaded test reports
         run: ls -la
 
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
