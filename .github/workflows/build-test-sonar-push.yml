@@ -108,8 +108,8 @@ jobs:
         with:
           name: testreports
 
-      - name: List reports directory
-        run: ls -la reports
+      - name: List downloaded test reports
+        run: ls -la
 
       - uses: actions/checkout@v4
         with:
@@ -124,7 +124,7 @@ jobs:
 #    needs: sonar
 #    steps:
 #      - name: Download production image tar
-#        uses: actions/download-artifact@v3
+#        uses: actions/download-artifact@v5
 #        with:
 #          name: docker-prod-image
 #
