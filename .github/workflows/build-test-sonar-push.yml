@@ -72,11 +72,20 @@ jobs:
 
       - name: Run tests in Docker container
         run: |
-          mkdir -p reports
+          # Cria a pasta no runner onde vamos receber os relatórios
+          mkdir -p ${{ github.workspace }}/reports
+          
+          # Roda o container montando a pasta inteira (ou só o que precisar)
           docker run --rm \
             --network ${{ env.DOCKER_NETWORK_NAME }} \
-            -v ${{ github.workspace }}/reports:/app/reports \
+            -v ${{ github.workspace }}/reports:/home/app/reports \
             $REPOSITORY_NAME-tests:latest
+          
+          # Após o container terminar, os arquivos estarão em ./reports no runner
+          ls -la ${{ github.workspace }}/reports/
+          
+          # Debug
+          find reports -type f -name "*.xml" || echo "Nenhum XML encontrado"
 
       - name: Upload test reports for Sonar
         uses: actions/upload-artifact@v4
