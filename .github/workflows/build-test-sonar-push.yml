@@ -112,8 +112,9 @@ jobs:
         with:
           name: testreports
 
-      - name: List downloaded test reports
-        run: ls -la
+      - name: Fix coverage.xml paths using GitHub workspace variable
+        run: |
+          sed -i "s|/home/app/source|${{ github.workspace }}/source|g" coverage.xml
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
