@@ -32,28 +32,26 @@ def generate_test_rsa_key_pair():
 
 
 @pytest.fixture(scope="session")
-def localstack_container():
-    """Start LocalStack container with DynamoDB"""
+def dynamodb_endpoint():
+    """Provide DynamoDB endpoint URL"""
     if os.getenv("CI"):
-        pytest.skip("Skipping LocalStack in CI")
-    with LocalStackContainer(image="localstack/localstack:latest") as localstack:
-        localstack.with_services("dynamodb")
-        yield localstack
+        yield "http://dynamodb:8000"
+    else:
+        with LocalStackContainer(image="localstack/localstack:latest") as localstack:
+            localstack.with_services("dynamodb")
+            yield localstack.get_url()
 
 
 @pytest.fixture(scope="session")
-def aws_credentials(localstack_container):
+def aws_credentials(dynamodb_endpoint):
     """Set AWS credentials for testing"""
     os.environ["AWS_ACCESS_KEY_ID"] = "test"
     os.environ["AWS_SECRET_ACCESS_KEY"] = "test"
     os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
-    if os.getenv("CI"):
-        os.environ["AWS_ENDPOINT_URL"] = "http://localhost:8000"
-    else:
-        os.environ["AWS_ENDPOINT_URL"] = localstack_container.get_url()
+    os.environ["AWS_ENDPOINT_URL"] = dynamodb_endpoint
 
     return {
-        "endpoint_url": os.environ["AWS_ENDPOINT_URL"],
+        "endpoint_url": dynamodb_endpoint,
         "region_name": "us-east-1"
     }
 
