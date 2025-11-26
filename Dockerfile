@@ -54,10 +54,9 @@ FROM production AS tests
 ENV CI="1"
 ENV TESTS_ROOT=${APP_BASE_DIR}/tests
 
-# 👉 Adicionado: voltar temporariamente para root para instalar deps
 USER root
+
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --directory ${APP_BASE_DIR}
-USER $USER
 
 COPY tests ${TESTS_ROOT}
 WORKDIR ${APP_BASE_DIR}
