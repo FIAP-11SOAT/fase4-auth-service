@@ -3,10 +3,12 @@ from source.configs.settings import Settings
 from source.helpers.jwt import JwtSignatureProvider
 from source.helpers.repository import AsyncDatabaseRepository
 
+import typing
+
 
 class Services:
-    jwt_signer: JwtSignatureProvider = None
-    repository: AsyncDatabaseRepository = None
+    jwt_signer: typing.Optional[JwtSignatureProvider] = None
+    repository: typing.Optional[AsyncDatabaseRepository] = None
 
     @classmethod
     def new(cls, settings: Settings, secrets: Secrets):
