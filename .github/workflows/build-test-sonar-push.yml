@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-test-image
-          path: $REPOSITORY_NAME-tests.tar
+          path: ${REPOSITORY_NAME}-tests.tar
 
       # Build imagem de produção
       - name: Build Docker production image
@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: docker-prod-image
-          path: $REPOSITORY_NAME-prod.tar
+          path: ${REPOSITORY_NAME}-prod.tar
 
       - name: List Docker images
         run: docker images
