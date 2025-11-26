@@ -62,7 +62,7 @@ jobs:
           - 8000:8000
     steps:
       - name: Download test image tar
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-test-image
 
@@ -78,7 +78,7 @@ jobs:
             $REPOSITORY_NAME-tests:latest
 
       - name: Upload test reports for Sonar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: testreports
           path: |
