@@ -14,6 +14,10 @@ ENV PYTHONUNBUFFERED=1
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 ENV PYTHONPATH=$APP_BASE_DIR
 
+# 👉 Adicionado: criar usuário e diretório com permissões
+RUN groupadd -r $USER && useradd -r -m -d $APP_BASE_DIR -g $USER $USER
+
+
 FROM base_env AS builder
 
 RUN apt-get update && \
@@ -28,7 +32,8 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY ./pyproject.toml ${APP_BASE_DIR}/pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --no-dev --directory ${APP_BASE_DIR}
 
-RUN chown -R "$USER":"$USER" $APP_BASE_DIR
+# 👉 Adicionado: ajustar permissões e trocar usuário
+RUN chown -R $USER:$USER $APP_BASE_DIR
 USER $USER
 
 
@@ -42,13 +47,18 @@ EXPOSE 8080
 
 CMD ["uvicorn", "source.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
 
+
 # Tests stage
 FROM production AS tests
 
 ENV CI="1"
 ENV TESTS_ROOT=${APP_BASE_DIR}/tests
 
+# 👉 Adicionado: voltar temporariamente para root para instalar deps
+USER root
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --directory ${APP_BASE_DIR}
+USER $USER
+
 COPY tests ${TESTS_ROOT}
 WORKDIR ${APP_BASE_DIR}
 
