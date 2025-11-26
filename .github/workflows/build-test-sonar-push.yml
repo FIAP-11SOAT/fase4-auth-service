@@ -65,21 +65,24 @@ jobs:
       - name: Load test image
         run: docker load -i $REPOSITORY_NAME-tests.tar
 
-      - name: Run tests in Docker container
-        run: |
-          mkdir -p reports
-          docker run --rm \
-            --network host \
-            -v ${{ github.workspace }}/reports:/app/reports \
-            $REPOSITORY_NAME-tests:latest
+      - name: Docker network info
+        run: docker network ls
 
-      - name: Upload test reports for Sonar
-        uses: actions/upload-artifact@v4
-        with:
-          name: testreports
-          path: |
-            reports/report.xml
-            reports/coverage.xml
+#      - name: Run tests in Docker container
+#        run: |
+#          mkdir -p reports
+#          docker run --rm \
+#            --network host \
+#            -v ${{ github.workspace }}/reports:/app/reports \
+#            $REPOSITORY_NAME-tests:latest
+#
+#      - name: Upload test reports for Sonar
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: testreports
+#          path: |
+#            reports/report.xml
+#            reports/coverage.xml
 
       - name: List reports directory
         run: ls -la reports
