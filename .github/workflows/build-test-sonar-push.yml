@@ -68,17 +68,23 @@ jobs:
       - name: Get Docker Network IP
         run: echo "DOCKER_NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep github_network_)" >> $GITHUB_ENV
 
-      - name: Run tests in Docker container
+      - name: Prepare reports directory
+        run: mkdir -p ${{ github.workspace }}/reports
+
+      - name: Execute tests and generate reports
         run: |
           docker run --rm \
             --network ${{ env.DOCKER_NETWORK_NAME }} \
-            -v ${{ github.workspace }}/report.xml:/home/app/report.xml \
-            -v ${{ github.workspace }}/coverage.xml:/home/app/coverage.xml \
+            -v ${{ github.workspace }}/reports:/home/app/reports \
             $REPOSITORY_NAME-tests:latest
 
-      - name: Fix coverage.xml paths using GitHub workspace variable
+      - name: Move reports to workspace
         run: |
-          sed -i "s|/home/app/source|${{ github.workspace }}/source|g" coverage.xml
+          mv ${{ github.workspace }}/reports/report.xml ${{ github.workspace }}/report.xml
+          mv ${{ github.workspace }}/reports/coverage.xml ${{ github.workspace }}/coverage.xml
+
+      - name: Fix coverage.xml paths using GitHub workspace variable
+        run: sed -i "s|/home/app/source|${{ github.workspace }}/source|g" coverage.xml
 
       - name: Upload test reports for Sonar
         uses: actions/upload-artifact@v4
