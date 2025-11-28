@@ -25,8 +25,8 @@ dev = [
 [tool.pytest.ini_options]
 addopts = [
     "--cache-clear",
-    "--junitxml=reports/report.xml",
+    "--junitxml=report.xml",
     "--cov=source",
-    "--cov-report=xml:reports/coverage.xml",
+    "--cov-report=xml:coverage.xml",
     "--cov-report=term",
 ]
