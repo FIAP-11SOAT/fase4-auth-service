@@ -16,7 +16,7 @@ class TestAuthEndpoint:
         await repository.create_user(user.model_dump())
 
         response = await client.get(
-            "/v1/auth",
+            "/auth",
             params={"tax_id": sample_user_data["tax_id"]}
         )
 
@@ -33,7 +33,7 @@ class TestAuthEndpoint:
     @pytest.mark.asyncio
     async def test_auth_user_not_found(self, client: AsyncClient):
         response = await client.get(
-            "/v1/auth",
+            "/auth",
             params={"tax_id": "99999999999"}
         )
 
@@ -44,7 +44,7 @@ class TestAuthEndpoint:
 
     @pytest.mark.asyncio
     async def test_auth_missing_tax_id(self, client: AsyncClient):
-        response = await client.get("/v1/auth")
+        response = await client.get("/auth")
         assert response.status_code == 422
 
     @pytest.mark.asyncio
@@ -57,7 +57,7 @@ class TestAuthEndpoint:
         await repository.create_user(user.model_dump())
 
         response = await client.get(
-            "/v1/auth",
+            "/auth",
             params={"tax_id": sample_user_data["tax_id"]}
         )
 

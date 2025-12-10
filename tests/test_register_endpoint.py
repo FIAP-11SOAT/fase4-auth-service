@@ -9,7 +9,7 @@ class TestRegisterEndpoint:
     @pytest.mark.asyncio
     async def test_register_success(self, client: AsyncClient, repository, sample_user_data):
         response = await client.post(
-            "/v1/auth",
+            "/auth",
             json=sample_user_data
         )
 
@@ -38,7 +38,7 @@ class TestRegisterEndpoint:
         await repository.create_user(user.model_dump())
 
         response = await client.post(
-            "/v1/auth",
+            "/auth",
             json=sample_user_data
         )
 
@@ -50,7 +50,7 @@ class TestRegisterEndpoint:
     @pytest.mark.asyncio
     async def test_register_missing_fields(self, client: AsyncClient):
         response = await client.post(
-            "/v1/auth",
+            "/auth",
             json={"tax_id": "12345678900"}
         )
 
@@ -59,7 +59,7 @@ class TestRegisterEndpoint:
     @pytest.mark.asyncio
     async def test_register_invalid_json(self, client: AsyncClient):
         response = await client.post(
-            "/v1/auth",
+            "/auth",
             content="invalid json"
         )
 
@@ -68,7 +68,7 @@ class TestRegisterEndpoint:
     @pytest.mark.asyncio
     async def test_register_creates_customer_user_type(self, client: AsyncClient, repository, sample_user_data):
         response = await client.post(
-            "/v1/auth",
+            "/auth",
             json=sample_user_data
         )
 

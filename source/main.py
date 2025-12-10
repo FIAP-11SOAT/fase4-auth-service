@@ -21,11 +21,10 @@ async def app_lifespan(_app: FastAPI):
     }
 
 
-app = FastAPI(lifespan=app_lifespan)
+app = FastAPI(lifespan=app_lifespan, docs_url="/auth/docs", redoc_url="/auth/redoc", openapi_url="/auth/openapi.json")
 app.include_router(root.router)
 app.include_router(auth.router)
 
 if __name__ == '__main__':
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080, access_log=False)

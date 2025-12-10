@@ -7,7 +7,6 @@ from source.schemas.response.auth import AuthResponse, RegisterResponse
 from source.usecase.auth import AuthUseCase, RegisterUseCase
 
 router = APIRouter(
-    prefix="/v1",
     tags=["auth"]
 )
 

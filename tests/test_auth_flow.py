@@ -7,7 +7,7 @@ class TestAuthFlow:
     @pytest.mark.asyncio
     async def test_register_then_auth(self, client: AsyncClient, sample_user_data):
         register_response = await client.post(
-            "/v1/auth",
+            "/auth",
             json=sample_user_data
         )
 
@@ -16,7 +16,7 @@ class TestAuthFlow:
         user_id = register_data["user_id"]
 
         auth_response = await client.get(
-            "/v1/auth",
+            "/auth",
             params={"tax_id": sample_user_data["tax_id"]}
         )
 
@@ -37,12 +37,12 @@ class TestAuthFlow:
         ]
 
         for user_data in users:
-            response = await client.post("/v1/auth", json=user_data)
+            response = await client.post("/auth", json=user_data)
             assert response.status_code == 201
 
         for user_data in users:
             auth_response = await client.get(
-                "/v1/auth",
+                "/auth",
                 params={"tax_id": user_data["tax_id"]}
             )
             assert auth_response.status_code == 200
