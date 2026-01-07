@@ -11,8 +11,6 @@ resource "aws_secretsmanager_secret" "secrets" {
 resource "aws_secretsmanager_secret_version" "secrets" {
   secret_id = aws_secretsmanager_secret.secrets.id
   secret_string = jsonencode({
-    JWT_PRIVATE_KEY = tls_private_key.jwt_key.private_key_pem
-    JWT_PUBLIC_KEY  = tls_private_key.jwt_key.public_key_pem,
-    JWT_JWK         = jose_jwk.example_rsa.jwk
+    JWT_PRIVATE_KEY = local.aws_infra_secrets["JWT_PRIVATE_KEY"]
   })
 }

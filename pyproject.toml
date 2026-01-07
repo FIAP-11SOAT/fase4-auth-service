@@ -1,7 +1,7 @@
 [project]
 name = "fase4-auth-service"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Fase4 Authentication Service"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
