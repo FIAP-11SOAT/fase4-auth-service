@@ -10,31 +10,6 @@ class AsyncDatabaseRepository:
         self.region_name = region_name
         self.session = aioboto3.Session()
 
-    async def create_table_if_not_exists(self):
-        async with self.session.resource('dynamodb', region_name=self.region_name) as dynamodb:
-            existing_tables = []
-            async for table in dynamodb.tables.all():
-                existing_tables.append(table.name)
-
-            if self.table_name in existing_tables:
-                return False
-
-            await dynamodb.create_table(
-                TableName=self.table_name,
-                BillingMode='PAY_PER_REQUEST',
-                KeySchema=[
-                    {'AttributeName': 'id', 'KeyType': 'HASH'}
-                ],
-                AttributeDefinitions=[
-                    {'AttributeName': 'id', 'AttributeType': 'S'},
-                    {'AttributeName': 'tax_id', 'AttributeType': 'S'}
-                ],
-                GlobalSecondaryIndexes=[{
-                    'IndexName': 'TaxIDIndex',
-                    'KeySchema': [{'AttributeName': 'tax_id', 'KeyType': 'HASH'}],
-                    'Projection': {'ProjectionType': 'ALL'}}])
-            return True
-
     @asynccontextmanager
     async def get_table(self):
         async with self.session.resource('dynamodb', region_name=self.region_name) as dynamodb:
