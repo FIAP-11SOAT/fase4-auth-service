@@ -173,7 +173,7 @@ jobs:
       - name: Set ECR variables
         run: |
           echo "ECR_REGISTRY=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com" >> $GITHUB_ENV
-          echo "ECR_REPOSITORY=${{ env.REPOSITORY_NAME }}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=${{ env.REPOSITORY_NAME }}-ecr" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Tag and push images to ECR
