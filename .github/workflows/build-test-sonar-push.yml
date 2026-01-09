@@ -8,7 +8,6 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
   REPOSITORY_NAME: ${{ github.event.repository.name }}
   REPORTS_PATH: reports
 
@@ -164,12 +163,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Get AWS Account ID
+        run: |
+          echo "AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_ENV
+
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set ECR variables
         run: |
-          echo "ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com" >> $GITHUB_ENV
+          echo "ECR_REGISTRY=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com" >> $GITHUB_ENV
           echo "ECR_REPOSITORY=${{ env.REPOSITORY_NAME }}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
